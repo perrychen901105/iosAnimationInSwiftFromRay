@@ -52,6 +52,8 @@ class ViewController: UIViewController {
   let label = UILabel()
   let messages = ["Connecting ...", "Authorizing ...", "Sending credentials ...", "Failed"]
   
+    var statusPosition = CGPoint.zeroPoint
+    
   // MARK: view controller methods
   
   override func viewDidLoad() {
@@ -75,6 +77,8 @@ class ViewController: UIViewController {
     label.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
     label.textAlignment = .Center
     status.addSubview(label)
+    
+    statusPosition = status.center
   }
   
   override func viewWillAppear(animated: Bool) {
@@ -82,6 +86,14 @@ class ViewController: UIViewController {
     heading.center.x -= view.bounds.width
     username.center.x -= view.bounds.width
     password.center.x -= view.bounds.width
+    
+    cloud1.alpha = 0.0
+    cloud2.alpha = 0.0
+    cloud3.alpha = 0.0
+    cloud4.alpha = 0.0
+    
+    loginButton.center.y += 30.0
+    loginButton.alpha = 0.0
   }
   
   override func viewDidAppear(animated: Bool) {
@@ -97,13 +109,73 @@ class ViewController: UIViewController {
     UIView.animateWithDuration(0.5, delay: 0.4, options: nil, animations: { () -> Void in
         self.password.center.x += self.view.bounds.width
     }, completion: nil)
+    
+    UIView.animateWithDuration(0.5, delay: 0.5, options: nil, animations: { () -> Void in
+        self.cloud1.alpha = 1.0
+        }, completion: nil)
+    
+    UIView.animateWithDuration(0.5, delay: 0.7, options: nil, animations: { () -> Void in
+        self.cloud2.alpha = 1.0
+        }, completion: nil)
+    
+    UIView.animateWithDuration(0.5, delay: 0.9, options: nil, animations: { () -> Void in
+        self.cloud3.alpha = 1.0
+        }, completion: nil)
+    
+    UIView.animateWithDuration(0.5, delay: 1.1, options: nil, animations: { () -> Void in
+        self.cloud4.alpha = 1.0
+        }, completion: nil)
+    
+    // unsingSpringWithDamping: controls the amount of damping, closer to 0.0 create a bouncier animation
+    UIView.animateWithDuration(0.3, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: nil, animations: { () -> Void in
+        self.loginButton.center.y -= 30
+        self.loginButton.alpha = 1.0
+    }, completion: nil)
   }
   
   // MARK: further methods
   
   @IBAction func login() {
+    UIView.animateWithDuration(1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: nil, animations: { () -> Void in
+        self.loginButton.bounds.size.width += 80.0
+    }) { (finish) -> Void in
+        self.showMessage(index: 0)
+    }
     
+    UIView.animateWithDuration(0.33, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: nil, animations: { () -> Void in
+        self.loginButton.center.y += 60.0
+        self.loginButton.backgroundColor = UIColor(red: 0.85, green: 0.83, blue: 0.45, alpha: 1.0)
+        self.spinner.center = CGPoint(x: 40.0, y: self.loginButton.frame.size.height / 2)
+        self.spinner.alpha = 1.0
+    }, completion: nil)
+    self.username.center.x -= 30;
+    self.password.center.x -= 30;
+    UIView.animateWithDuration(1.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.0, options: nil, animations: { () -> Void in
+        self.username.center.x += 30;
+        self.password.center.x += 30;
+    }, completion: nil);
   }
   
+    func showMessage(#index: Int) {
+        label.text = messages[index]
+        
+        UIView.transitionWithView(status, duration: 0.33, options: .CurveEaseOut | .TransitionCurlDown, animations: { () -> Void in
+            self.status.hidden = false
+            }, completion: { _ in
+                // transition completion
+        })
+    }
+    
+    func removeMessage(#index: Int) {
+        UIView.animateWithDuration(0.33, delay: 0.0, options: nil, animations: { () -> Void in
+            self.status.center.x += self.view.frame.size.width
+        }) { _ in
+            self.status.hidden = true
+            self.status.center = self.statusPosition
+            
+            self.showMessage(index: index+1)
+        }
+    }
+    
 }
 
