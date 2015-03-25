@@ -131,10 +131,26 @@ class ViewController: UIViewController {
         self.loginButton.center.y -= 30
         self.loginButton.alpha = 1.0
     }, completion: nil)
+    
+    animateCloud(cloud1);
+    animateCloud(cloud2);
+    animateCloud(cloud3);
+    animateCloud(cloud4);
   }
   
   // MARK: further methods
   
+    func animateCloud(cloud: UIImageView) {
+        let cloudSpeed = 60.0/view.frame.size.width
+        let dur = (view.frame.size.width - cloud.frame.origin.x) * cloudSpeed
+        UIView.animateWithDuration(NSTimeInterval(dur), delay: 0.0, options: .CurveLinear, animations: { () -> Void in
+            cloud.frame.origin.x = self.view.frame.size.width
+        }) { _ in
+            cloud.frame.origin.x = -cloud.frame.size.width
+            self.animateCloud(cloud)
+        }
+    }
+    
   @IBAction func login() {
     UIView.animateWithDuration(1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: nil, animations: { () -> Void in
         self.loginButton.bounds.size.width += 80.0
@@ -162,7 +178,13 @@ class ViewController: UIViewController {
         UIView.transitionWithView(status, duration: 0.33, options: .CurveEaseOut | .TransitionCurlDown, animations: { () -> Void in
             self.status.hidden = false
             }, completion: { _ in
-                // transition completion
+                delay(seconds: 2.0) {
+                    if index < self.messages.count - 1 {
+                        self.removeMessage(index: index)
+                    } else {
+                        self.resetForm()
+                    }
+                }
         })
     }
     
@@ -176,6 +198,26 @@ class ViewController: UIViewController {
             self.showMessage(index: index+1)
         }
     }
+    
+    func resetForm() {
+        UIView.transitionWithView(status, duration: 0.2, options: .TransitionCurlUp, animations: { () -> Void in
+            self.status.hidden = true
+            self.status.center = self.statusPosition
+        }) { _ in
+            
+        }
+        
+        UIView.animateWithDuration(0.33, delay: 0.0, options: nil, animations: { () -> Void in
+            self.spinner.center = CGPoint(x: -20.0, y: 16.0);
+            self.spinner.alpha = 0.0;
+            self.loginButton.backgroundColor = UIColor(red: 0.63, green: 0.84, blue: 0.35, alpha: 1.0);
+            self.loginButton.bounds.size.width -= 80.0;
+            self.loginButton.center.y -= 60.0;
+        }) { _ in
+            
+        }
+    }
+    
     
 }
 
