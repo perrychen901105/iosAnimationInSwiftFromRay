@@ -54,6 +54,11 @@ class ViewController: UIViewController {
   
   //MARK: view controller methods
   
+    enum AnimationDirection: Int {
+        case Positive = 1
+        case Negative = -1
+    }
+    
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -74,7 +79,33 @@ class ViewController: UIViewController {
   
   //MARK: custom methods
   
-  func changeFlightDataTo(data: FlightData) {
+    func cubeTransition(#label: UILabel, text: String, direction: AnimationDirection) {
+        let auxLabel = UILabel(frame: label.frame)
+        auxLabel.text = text
+        auxLabel.font = label.font
+        auxLabel.textAlignment = label.textAlignment
+        auxLabel.textColor = label.textColor
+        auxLabel.backgroundColor = UIColor.clearColor()
+        
+        let auxLabelOffset = CGFloat(direction.rawValue) * label.frame.size.height / 2.0
+        auxLabel.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.1), CGAffineTransformMakeTranslation(0.0, auxLabelOffset))
+        
+        label.superview!.addSubview(auxLabel)
+    
+        UIView.animateWithDuration(0.5, delay: 0.0, options: .CurveEaseOut, animations: { () -> Void in
+            auxLabel.transform = CGAffineTransformIdentity
+            label.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.1), CGAffineTransformMakeTranslation(0.0, -auxLabelOffset))
+        }) { _ in
+            label.text = auxLabel.text
+            label.transform = CGAffineTransformIdentity
+            
+            auxLabel.removeFromSuperview()
+        }
+    
+    
+    }
+    
+    func changeFlightDataTo(data: FlightData, animated: Bool = false) {
     
     // populate the UI with the next flight's data
     summary.text = data.summary
@@ -83,14 +114,79 @@ class ViewController: UIViewController {
     departingFrom.text = data.departingFrom
     arrivingTo.text = data.arrivingTo
     flightStatus.text = data.flightStatus
-    bgImageView.image = UIImage(named: data.weatherImageName)
-    snowView.hidden = !data.showWeatherEffects
-    
+        if animated {
+            fadeImageView(bgImageView, toImage: UIImage(named: data.weatherImageName)!, showEffects: data.showWeatherEffects)
+            let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
+            
+            cubeTransition(label: flightNr, text: data.flightNr, direction: direction)
+            cubeTransition(label: gateNr, text: data.gateNr, direction: direction)
+            
+            let offsetDeparting = CGPoint(
+                x: CGFloat(direction.rawValue * 80),
+                    y:0.0)
+            moveLabel(departingFrom, text: data.departingFrom, offset: offsetDeparting)
+            let offsetArriving = CGPoint(x: 0.0, y: CGFloat(direction.rawValue * 50))
+            moveLabel(arrivingTo, text: data.arrivingTo, offset: offsetArriving)
+        } else {
+            bgImageView.image = UIImage(named: data.weatherImageName)
+            snowView.hidden = !data.showWeatherEffects
+            let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
+            cubeTransition(label: flightNr, text: data.flightNr, direction: direction)
+            cubeTransition(label: gateNr, text: data.gateNr, direction: direction)
+        }
+        
+        
+        
     // schedule next flight
     delay(seconds: 3.0) {
-      self.changeFlightDataTo(data.isTakingOff ? parisToRome : londonToParis)
+        self.changeFlightDataTo(data.isTakingOff ? parisToRome : londonToParis, animated: true)
     }
   }
   
+    /**
+    
+    :param: imageView   going to fade out
+    :param: toImage     the new image you want visible at the end of the animation
+    :param: showEffects indicating whether the scene should show or hide the snowfall effect.
+    */
+    func fadeImageView(imageView: UIImageView, toImage: UIImage, showEffects: Bool) {
+        UIView.transitionWithView(imageView, duration: 1.0, options: .TransitionCrossDissolve, animations: { () -> Void in
+            imageView.image = toImage
+        }, completion: nil)
+        
+        UIView.animateWithDuration(1.0, delay: 0.0, options: .CurveEaseOut, animations: { () -> Void in
+            self.snowView.alpha = showEffects ? 1.0 : 0.0
+        }, completion: nil)
+    }
+    
+    func moveLabel(label: UILabel, text: String, offset: CGPoint) {
+        let auxLabel = UILabel(frame: label.frame)
+        auxLabel.text = text
+        auxLabel.font = label.font
+        auxLabel.textAlignment = label.textAlignment
+        auxLabel.textColor = label.textColor
+        auxLabel.backgroundColor = UIColor.clearColor()
+        
+        auxLabel.transform = CGAffineTransformMakeTranslation(offset.x, offset.y)
+        auxLabel.alpha = 0
+        view.addSubview(auxLabel)
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, options: .CurveEaseIn, animations: { () -> Void in
+            label.transform = CGAffineTransformMakeTranslation(offset.x, offset.y)
+            label.alpha = 0.0
+        }, completion: nil)
+        
+        UIView.animateWithDuration(0.25, delay: 0.1, options: .CurveEaseIn, animations: { () -> Void in
+            auxLabel.transform = CGAffineTransformIdentity
+            auxLabel.alpha = 1.0
+        }) { _ in
+            // clean up
+            auxLabel.removeFromSuperview()
+            
+            label.text = text
+            label.alpha = 1.0
+            label.transform = CGAffineTransformIdentity
+        }
+    }
   
 }
