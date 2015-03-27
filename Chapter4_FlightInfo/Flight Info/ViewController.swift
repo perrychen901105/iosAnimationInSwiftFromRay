@@ -115,6 +115,8 @@ class ViewController: UIViewController {
     arrivingTo.text = data.arrivingTo
     flightStatus.text = data.flightStatus
         if animated {
+            planeDepart()
+            
             fadeImageView(bgImageView, toImage: UIImage(named: data.weatherImageName)!, showEffects: data.showWeatherEffects)
             let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
             
@@ -156,6 +158,38 @@ class ViewController: UIViewController {
         
         UIView.animateWithDuration(1.0, delay: 0.0, options: .CurveEaseOut, animations: { () -> Void in
             self.snowView.alpha = showEffects ? 1.0 : 0.0
+        }, completion: nil)
+    }
+    
+    func planeDepart() {
+        let originalCenter = planeImage.center
+        
+        UIView.animateKeyframesWithDuration(1.5, delay: 0.0, options: nil, animations: { () -> Void in
+            // add key frames
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.25, animations: { () -> Void in
+                self.planeImage.center.x += 80.0
+                self.planeImage.center.y -= 10.0
+            })
+            
+            UIView.addKeyframeWithRelativeStartTime(0.1, relativeDuration: 0.4, animations: { () -> Void in
+                self.planeImage.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_4/2))
+            })
+            
+            UIView.addKeyframeWithRelativeStartTime(0.25, relativeDuration: 0.25, animations: { () -> Void in
+                self.planeImage.center.x += 100.0
+                self.planeImage.center.y -= 50.0
+                self.planeImage.alpha = 0.0
+            })
+            
+            UIView.addKeyframeWithRelativeStartTime(0.51, relativeDuration: 0.01, animations: { () -> Void in
+                self.planeImage.transform = CGAffineTransformIdentity
+                self.planeImage.center = CGPoint(x: 0.0, y: originalCenter.y)
+            })
+            
+            UIView.addKeyframeWithRelativeStartTime(0.55, relativeDuration: 0.45, animations: { () -> Void in
+                self.planeImage.alpha = 1.0
+                self.planeImage.center = originalCenter
+            })
         }, completion: nil)
     }
     
