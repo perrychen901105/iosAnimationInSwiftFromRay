@@ -108,15 +108,10 @@ class ViewController: UIViewController {
     func changeFlightDataTo(data: FlightData, animated: Bool = false) {
     
     // populate the UI with the next flight's data
-    summary.text = data.summary
-    flightNr.text = data.flightNr
-    gateNr.text = data.gateNr
-    departingFrom.text = data.departingFrom
-    arrivingTo.text = data.arrivingTo
-    flightStatus.text = data.flightStatus
+   
         if animated {
             planeDepart()
-            
+            summarySwitchTo(data.summary);
             fadeImageView(bgImageView, toImage: UIImage(named: data.weatherImageName)!, showEffects: data.showWeatherEffects)
             let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
             
@@ -130,6 +125,12 @@ class ViewController: UIViewController {
             let offsetArriving = CGPoint(x: 0.0, y: CGFloat(direction.rawValue * 50))
             moveLabel(arrivingTo, text: data.arrivingTo, offset: offsetArriving)
         } else {
+            summary.text = data.summary
+            flightNr.text = data.flightNr
+            gateNr.text = data.gateNr
+            departingFrom.text = data.departingFrom
+            arrivingTo.text = data.arrivingTo
+            flightStatus.text = data.flightStatus
             bgImageView.image = UIImage(named: data.weatherImageName)
             snowView.hidden = !data.showWeatherEffects
             let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
@@ -223,4 +224,23 @@ class ViewController: UIViewController {
         }
     }
   
+    func summarySwitchTo(summaryText: String) {
+        let originSummaryPosition = summary.center
+        UIView.animateKeyframesWithDuration(1.0, delay: 0.0, options: nil, animations: { () -> Void in
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.45, animations: { () -> Void in
+                self.summary.center.y -= 100.0
+            })
+            UIView.addKeyframeWithRelativeStartTime(0.5, relativeDuration: 0.45, animations: { () -> Void in
+                self.summary.center.y += 100.0
+            })
+        }) { _ in
+            
+        }
+        
+        delay(seconds: 0.5) { () -> () in
+            self.summary.text = summaryText
+        }
+        
+    }
+    
 }
