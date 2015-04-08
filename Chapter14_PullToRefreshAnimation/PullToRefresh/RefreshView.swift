@@ -52,7 +52,20 @@ class RefreshView: UIView, UIScrollViewDelegate {
     imgView.contentMode = .ScaleAspectFill
     imgView.clipsToBounds = true
     addSubview(imgView)
-  }
+    
+    ovalShapeLayer.strokeColor = UIColor.whiteColor().CGColor
+    ovalShapeLayer.fillColor = UIColor.clearColor().CGColor
+    ovalShapeLayer.lineWidth = 4.0
+    ovalShapeLayer.lineDashPattern = [2, 3]
+    let refreshRadius = frame.size.height/2 * 0.8
+    ovalShapeLayer.path = UIBezierPath(ovalInRect: CGRect(x: frame.size.width/2 - refreshRadius, y: frame.size.height/2 - refreshRadius, width: 2 * refreshRadius, height: 2 * refreshRadius)).CGPath
+    
+    layer.addSublayer(ovalShapeLayer)
+    
+    let airplaneImage = UIImage(named: "airplane.png")!
+    airplaneLayer.contents = airplaneImage.CGImage
+    
+    }
   
   required init(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -103,7 +116,7 @@ class RefreshView: UIView, UIScrollViewDelegate {
   }
   
   func redrawFromProgress(progress: CGFloat) {
-    
+    ovalShapeLayer.strokeEnd = progress
   }
   
 }
