@@ -61,12 +61,15 @@ class ContainerViewController: UIViewController {
     view.addSubview(menuViewController.view)
     menuViewController.didMoveToParentViewController(self)
     
+    menuViewController.view.layer.anchorPoint.x = 1.0
     menuViewController.view.frame = CGRect(x: -menuWidth, y: 0, width: menuWidth, height: view.frame.height)
     
     var panGesture = UIPanGestureRecognizer(target:self, action:Selector("handleGesture:"))
     view.addGestureRecognizer(panGesture)
+    
+    setToPercent(0.0)
   }
-  
+
   func handleGesture(recognizer: UIPanGestureRecognizer) {
     
     let translation = recognizer.translationInView(recognizer.view!.superview!)
@@ -102,7 +105,7 @@ class ContainerViewController: UIViewController {
     default: break
     }
   }
-  
+    
   func toggleSideMenu() {
     let isOpen = floor(centerViewController.view.frame.origin.x/menuWidth)
     let targetProgress: CGFloat = isOpen == 1.0 ? 0.0: 1.0
@@ -116,7 +119,20 @@ class ContainerViewController: UIViewController {
   
   func setToPercent(percent: CGFloat) {
     centerViewController.view.frame.origin.x = menuWidth * CGFloat(percent)
-    menuViewController.view.frame.origin.x = menuWidth * CGFloat(percent) - menuWidth
-  }
+//    menuViewController.view.frame.origin.x = menuWidth * CGFloat(percent) - menuWidth
+    menuViewController.view.layer.transform = menuTransformForPercent(percent)
+    menuViewController.view.alpha = CGFloat(max(0.2, percent))
+    }
   
+    func menuTransformForPercent(percent: CGFloat) -> CATransform3D {
+        var identity = CATransform3DIdentity
+        // to enable 3D transform on a layer you need to set m34 to -1.0 / [camera distance]
+        identity.m34 = -1.0/1000
+        let remainingPercent = 1.0 - percent
+        let angle = remainingPercent * CGFloat(-M_PI_2)
+        let rotationTransform = CATransform3DRotate(identity, angle, 0.0, 1.0, 0.0)
+        let translationTransform = CATransform3DMakeTranslation(menuWidth * percent, 0, 0)
+        return CATransform3DConcat(rotationTransform, translationTransform)
+    }
+    
 }
