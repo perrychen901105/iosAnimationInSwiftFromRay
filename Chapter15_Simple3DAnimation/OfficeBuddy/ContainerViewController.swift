@@ -81,7 +81,9 @@ class ContainerViewController: UIViewController {
     case .Began:
       let isOpen = floor(centerViewController.view.frame.origin.x/menuWidth)
       isOpening = isOpen == 1.0 ? false: true
-      
+      menuViewController.view.layer.shouldRasterize = true
+        menuViewController.view.layer.rasterizationScale = UIScreen.mainScreen().scale
+        
     case .Changed:
       self.setToPercent(isOpening ? progress: (1.0 - progress))
       
@@ -99,9 +101,9 @@ class ContainerViewController: UIViewController {
       UIView.animateWithDuration(animationTime, animations: {
         self.setToPercent(targetProgress)
         }, completion: {_ in
-          
+        self.menuViewController.view.layer.shouldRasterize = false
       })
-      
+        
     default: break
     }
   }
@@ -122,6 +124,13 @@ class ContainerViewController: UIViewController {
 //    menuViewController.view.frame.origin.x = menuWidth * CGFloat(percent) - menuWidth
     menuViewController.view.layer.transform = menuTransformForPercent(percent)
     menuViewController.view.alpha = CGFloat(max(0.2, percent))
+    
+    let centerVC = (centerViewController as UINavigationController).viewControllers.first as? CenterViewController
+    var identity = CATransform3DIdentity
+    if let menuButton = centerVC?.menuButton {
+        menuButton.imageView.layer.transform = buttonTransformForPercent(percent)
+    }
+    
     }
   
     func menuTransformForPercent(percent: CGFloat) -> CATransform3D {
@@ -134,5 +143,14 @@ class ContainerViewController: UIViewController {
         let translationTransform = CATransform3DMakeTranslation(menuWidth * percent, 0, 0)
         return CATransform3DConcat(rotationTransform, translationTransform)
     }
-    
+    func buttonTransformForPercent(percent: CGFloat) -> CATransform3D {
+        
+        var identity = CATransform3DIdentity
+        identity.m34 = -1.0/1000
+        
+        let angle = percent * CGFloat(-M_PI)
+        let rotationTransform = CATransform3DRotate(identity, angle, 1.0, 1.0, 0.0)
+        
+        return rotationTransform
+    }
 }
