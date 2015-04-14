@@ -62,7 +62,7 @@ class ViewController: UIViewController {
     //start rotating the flights
     changeFlightDataTo(londonToParis)
     
-    let rect = CGRect(x: 0.0, y: 100.0, width: view.bounds.width, height: 50.0)
+    let rect = CGRect(x: 0.0, y: -70.0, width: view.bounds.width, height: 50.0)
     let emitter = CAEmitterLayer()
     emitter.frame = rect
     view.layer.addSublayer(emitter)
@@ -73,16 +73,33 @@ class ViewController: UIViewController {
     
     let emitterCell = CAEmitterCell()
     emitterCell.contents = UIImage(named: "flake.png")!.CGImage
-    emitterCell.birthRate = 20
+    emitterCell.birthRate = 150
     emitterCell.lifetime = 3.5
+    emitterCell.lifetimeRange = 1.0
     emitter.emitterCells = [emitterCell]
     
     emitterCell.yAcceleration = 70.0
     emitterCell.xAcceleration = 10.0
     emitterCell.velocity = 20.0
+    // the starter angle for the particles
     emitterCell.emissionLongitude = CGFloat(-M_PI_2)
     
     emitterCell.velocityRange = 200.0
+    emitterCell.emissionRange = CGFloat(-M_PI_2)
+    
+    emitterCell.color = UIColor(red: 0.9, green: 1.0, blue: 1.0, alpha: 1.0).CGColor
+    emitterCell.redRange = 0.3
+    emitterCell.greenRange = 0.3
+    emitterCell.blueRange = 0.3
+    
+    emitterCell.scale = 0.8
+    emitterCell.scaleRange = 0.8
+    
+    // change the speed of the emitter
+    emitterCell.scaleSpeed = -0.15
+    
+    emitterCell.alphaRange = 0.75
+    emitterCell.alphaSpeed = -0.15
   }
   
   //MARK: custom methods
