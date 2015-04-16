@@ -27,7 +27,13 @@ class ViewController: UIViewController {
   @IBOutlet var penguin: UIImageView!
   @IBOutlet var slideButton: UIButton!
   
-  var isLookingRight: Bool = true
+    var isLookingRight: Bool = true {
+        didSet {
+            let xScale: CGFloat = isLookingRight ? 1 : -1
+            penguin.transform = CGAffineTransformMakeScale(xScale, 1)
+            slideButton.transform = penguin.transform
+        }
+    }
   var penguinY: CGFloat!
   
   var walkSize: CGSize!
@@ -58,27 +64,53 @@ class ViewController: UIViewController {
     
     //setup the animation
     penguinY = penguin.frame.origin.y
-    
+    loadWalkAnimation()
   }
   
   func loadWalkAnimation() {
-    
+    // store all the frame images of your frame animation.
+    penguin.animationImages = walkFrames
+    // how long one iteration of the animation should last
+    penguin.animationDuration = animationDuration / 3
+    // controls the repeat count of the animation
+    penguin.animationRepeatCount = 3
   }
   
   func loadSlideAnimation() {
-    
+    penguin.animationImages = slideFrames
+    penguin.animationDuration = animationDuration
+    penguin.animationRepeatCount = 1
   }
   
   @IBAction func actionLeft(sender: AnyObject) {
+    isLookingRight = false
+    penguin.startAnimating()
     
+    UIView.animateWithDuration(animationDuration, delay: 0.0, options: .CurveEaseOut, animations: { () -> Void in
+        self.penguin.center.x -= self.walkSize.width
+    }, completion: nil)
   }
   
   @IBAction func actionRight(sender: AnyObject) {
+    isLookingRight = true
     
+    penguin.startAnimating()
+    UIView.animateWithDuration(animationDuration, delay: 0.0, options: .CurveEaseOut, animations: { () -> Void in
+        self.penguin.center.x += self.walkSize.width
+    }, completion: nil)
   }
   
   @IBAction func actionSlide(sender: AnyObject) {
+    loadSlideAnimation()
+    penguin.frame = CGRect(x: penguin.frame.origin.x, y: penguinY + (walkSize.height - slideSize.height), width: slideSize.width, height: slideSize.height)
+    penguin.startAnimating()
     
+    UIView.animateWithDuration(animationDuration - 0.02, delay: 0.0, options: .CurveEaseOut, animations: { () -> Void in
+        self.penguin.center.x += self.isLookingRight ? self.slideSize.width : -self.slideSize.width
+    }) { _ in
+        self.penguin.frame = CGRect(x: self.penguin.frame.origin.x, y: self.penguinY, width: self.walkSize.width, height: self.walkSize.height)
+        self.loadWalkAnimation()
+    }
   }
 }
 
