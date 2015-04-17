@@ -29,12 +29,16 @@ class ViewController: UIViewController {
   @IBOutlet var listView: UIScrollView!
   @IBOutlet var bgImage: UIImageView!
   var selectedImage: UIImageView?
+    
+    let transition = PopAnimator()
   
   //MARK: UIViewController
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+    transition.dismissCompletion = {
+        self.selectedImage!.hidden = false
+    }
   }
   
   override func viewWillAppear(animated: Bool) {
@@ -106,6 +110,33 @@ class ViewController: UIViewController {
     //present details view controller
     let herbDetails = storyboard!.instantiateViewControllerWithIdentifier("HerbDetailsViewController")! as! HerbDetailsViewController
     herbDetails.herb = selectedHerb
+    // will ask ViewController for an animator object every time you present the details view controller on the screen. However, you still haven't implemented any of UIViewControllerTransitioningDelegate's methods. so will still use the default transition.
+    herbDetails.transitioningDelegate = self
     presentViewController(herbDetails, animated: true, completion: nil)
   }
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        // size tells you what size your view controller is transitioning to. the second parameter is the transition coordinator object, which gives you access to a number of the transition's properties
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        coordinator.animateAlongsideTransition({ (context) -> Void in
+            self.bgImage.alpha = (size.width > size.height) ? 0.25 : 0.55
+            self.positionListItems()
+        }, completion: nil)
+    }
 }
+
+extension ViewController: UIViewControllerTransitioningDelegate
+{
+   func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.originFrame = selectedImage!.superview!.convertRect(selectedImage!.frame, toView: nil)
+        transition.presenting = true
+        selectedImage!.hidden = true
+        return transition
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.presenting = false
+        return transition
+    }
+}
+
