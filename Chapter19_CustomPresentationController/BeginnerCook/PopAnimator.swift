@@ -9,7 +9,7 @@
 import UIKit
 
 class PopAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-    let duration = 5.0
+    let duration = 1.0
     var presenting = true
     var originFrame = CGRect.zeroRect
     var dismissCompletion: (()->())?
@@ -49,6 +49,7 @@ class PopAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             herbView.center = CGPoint(x: CGRectGetMidX(initialFrame), y: CGRectGetMidY(initialFrame))
             herbView.clipsToBounds = true
             herbController.containerView.alpha = 0.0
+            herbView.layer.cornerRadius = 20.0 / xScaleFactor
         }
         containerView.addSubview(toView)
         containerView.bringSubviewToFront(herbView)
@@ -62,5 +63,9 @@ class PopAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             }
             transitionContext.completeTransition(true)
         }
+        
+        UIView.animateWithDuration(duration / 2, animations: { () -> Void in
+            herbView.layer.cornerRadius = self.presenting ? 0.0 : 20.0/xScaleFactor
+        })
     }
 }
