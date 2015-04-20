@@ -76,7 +76,7 @@ class ViewController: UITableViewController, UITableViewDelegate, UITableViewDat
   }
   
   override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+    let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
     cell.accessoryType = .None
     cell.textLabel!.text = packItems[indexPath.row]
     cell.imageView!.image = UIImage(named: "summericons_100px_0\(indexPath.row).png")

@@ -76,7 +76,7 @@ class RefreshView: UIView, UIScrollViewDelegate {
   
   // MARK: Scroll View Delegate methods
   
-  func scrollViewDidScroll(scrollView: UIScrollView!) {
+  func scrollViewDidScroll(scrollView: UIScrollView) {
     let offsetY = CGFloat( max(-(scrollView.contentOffset.y + scrollView.contentInset.top), 0.0))
     self.progress = min(max(offsetY / frame.size.height, 0.0), 1.0)
     
@@ -85,12 +85,16 @@ class RefreshView: UIView, UIScrollViewDelegate {
     }
   }
   
-  func scrollViewWillEndDragging(scrollView: UIScrollView!, withVelocity velocity: CGPoint, targetContentOffset: UnsafePointer<CGPoint>) {
-    if !isRefreshing && self.progress >= 1.0 {
-      delegate?.refreshViewDidRefresh(self)
-      beginRefreshing()
+    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if !isRefreshing && self.progress >= 1.0 {
+            delegate?.refreshViewDidRefresh(self)
+            beginRefreshing()
+        }
     }
-  }
+//    
+//  func scrollViewWillEndDragging(scrollView: UIScrollView!, withVelocity velocity: CGPoint, targetContentOffset: UnsafePointer<CGPoint>) {
+//    
+//  }
   
   // MARK: animate the Refresh View
   
