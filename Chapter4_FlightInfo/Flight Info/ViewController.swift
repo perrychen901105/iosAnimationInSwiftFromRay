@@ -111,31 +111,31 @@ class ViewController: UIViewController {
    
         if animated {
             planeDepart()
-            summarySwitchTo(data.summary);
-            fadeImageView(bgImageView, toImage: UIImage(named: data.weatherImageName)!, showEffects: data.showWeatherEffects)
+            summarySwitchTo(data.summary as String);
+            fadeImageView(bgImageView, toImage: UIImage(named: data.weatherImageName as String)!, showEffects: data.showWeatherEffects)
             let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
             
-            cubeTransition(label: flightNr, text: data.flightNr, direction: direction)
-            cubeTransition(label: gateNr, text: data.gateNr, direction: direction)
+            cubeTransition(label: flightNr, text: data.flightNr as String, direction: direction)
+            cubeTransition(label: gateNr, text: data.gateNr as String, direction: direction)
             
             let offsetDeparting = CGPoint(
                 x: CGFloat(direction.rawValue * 80),
                     y:0.0)
-            moveLabel(departingFrom, text: data.departingFrom, offset: offsetDeparting)
+            moveLabel(departingFrom, text: data.departingFrom as String, offset: offsetDeparting)
             let offsetArriving = CGPoint(x: 0.0, y: CGFloat(direction.rawValue * 50))
-            moveLabel(arrivingTo, text: data.arrivingTo, offset: offsetArriving)
+            moveLabel(arrivingTo, text: data.arrivingTo as String, offset: offsetArriving)
         } else {
-            summary.text = data.summary
-            flightNr.text = data.flightNr
-            gateNr.text = data.gateNr
-            departingFrom.text = data.departingFrom
-            arrivingTo.text = data.arrivingTo
-            flightStatus.text = data.flightStatus
-            bgImageView.image = UIImage(named: data.weatherImageName)
+            summary.text = data.summary as String
+            flightNr.text = data.flightNr as String
+            gateNr.text = data.gateNr as String
+            departingFrom.text = data.departingFrom as String
+            arrivingTo.text = data.arrivingTo as String
+            flightStatus.text = data.flightStatus as String
+            bgImageView.image = UIImage(named: data.weatherImageName as String)
             snowView.hidden = !data.showWeatherEffects
             let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
-            cubeTransition(label: flightNr, text: data.flightNr, direction: direction)
-            cubeTransition(label: gateNr, text: data.gateNr, direction: direction)
+            cubeTransition(label: flightNr, text: data.flightNr as String, direction: direction)
+            cubeTransition(label: gateNr, text: data.gateNr as String, direction: direction)
         }
         
         
