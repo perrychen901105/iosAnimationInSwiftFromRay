@@ -90,20 +90,31 @@ class RevealAnimator: UIPercentDrivenInteractiveTransition, UIViewControllerAnim
         var progress: CGFloat = abs(translation.x / 200.0)
         progress = min(max(progress, 0.01), 0.99)
         
+        
         switch recognizer.state {
         case .Changed:
             updateInteractiveTransition(progress)
         case .Cancelled, .Ended:
             // Setting the time and speed is a workaround for what seems like a UIKit bug; if you don’t use layer animations in the transition, you don’t have to set the layer’s begin time and the completion speed.
-            let transitionLayer = storedContext!.containerView().layer
-            transitionLayer.beginTime = CACurrentMediaTime()
-            if progress < 0.5 {
-                completionSpeed = -1.0
-                cancelInteractiveTransition()
+            if operation == .Push {
+                let transitionLayer = storedContext!.containerView().layer
+                transitionLayer.beginTime = CACurrentMediaTime()
+                if progress < 0.5 {
+                    completionSpeed = -1.0
+                    cancelInteractiveTransition()
+                } else {
+                    completionSpeed = 1.0
+                    finishInteractiveTransition()
+                }
             } else {
-                completionSpeed = 1.0
-                finishInteractiveTransition()
+                if progress < 0.5 {
+                    cancelInteractiveTransition()
+                } else {
+                    finishInteractiveTransition()
+                }
             }
+            
+            interactive = false
         default:
             break
         }
